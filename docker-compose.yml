@@ -1,0 +1,14 @@
+version: '3.8'
+
+services:
+  frontend:
+    build: .
+    image: christian98756/frontend:latest
+    ports:
+      - "80:80"
+    restart: unless-stopped
+    volumes:
+      - frontend_data:/usr/share/nginx/html
+
+volumes:
+  frontend_data:
