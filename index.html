@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Finanzas</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=Syne:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #0a0a0a;
+    --surface: #111111;
+    --surface2: #181818;
+    --border: #222222;
+    --text: #e8e8e8;
+    --muted: #555;
+    --income: #4ade80;
+    --expense: #f87171;
+    --accent: #e8e8e8;
+  }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Mono', monospace;
+    min-height: 100vh;
+    padding: 2rem 1.5rem 4rem;
+    max-width: 860px;
+    margin: 0 auto;
+  }
+
+  header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-bottom: 3rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid var(--border);
+  }
+
+  header h1 {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: 1.8rem;
+    letter-spacing: -0.03em;
+    color: var(--text);
+  }
+
+  header span {
+    font-size: 0.7rem;
+    color: var(--muted);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  .summary {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1px;
+    background: var(--border);
+    border: 1px solid var(--border);
+    margin-bottom: 3rem;
+  }
+
+  .card {
+    background: var(--surface);
+    padding: 1.5rem;
+  }
+
+  .card label {
+    display: block;
+    font-size: 0.65rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 0.6rem;
+  }
+
+  .card .amount {
+    font-family: 'Syne', sans-serif;
+    font-size: 1.6rem;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+  }
+
+  .card.balance .amount { color: var(--text); }
+  .card.income .amount  { color: var(--income); }
+  .card.expense .amount { color: var(--expense); }
+
+  .form-section { margin-bottom: 3rem; }
+
+  .form-title {
+    font-size: 0.65rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 1rem;
+  }
+
+  .form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr 2fr auto;
+    gap: 1px;
+    background: var(--border);
+    border: 1px solid var(--border);
+  }
+
+  .form-row input,
+  .form-row select {
+    background: var(--surface2);
+    border: none;
+    color: var(--text);
+    font-family: 'DM Mono', monospace;
+    font-size: 0.82rem;
+    padding: 0.9rem 1rem;
+    outline: none;
+    width: 100%;
+    transition: background 0.15s;
+  }
+
+  .form-row input::placeholder { color: var(--muted); }
+  .form-row input:focus,
+  .form-row select:focus { background: #1f1f1f; }
+  .form-row select option { background: #1a1a1a; }
+
+  .btn-add {
+    background: var(--text);
+    color: var(--bg);
+    border: none;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.75rem;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 0.9rem 1.4rem;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: opacity 0.15s;
+  }
+
+  .btn-add:hover { opacity: 0.85; }
+
+  .tx-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+  }
+
+  .tx-title {
+    font-size: 0.65rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  .tx-count { font-size: 0.65rem; color: var(--muted); }
+
+  .tx-list { border: 1px solid var(--border); }
+
+  .tx-item {
+    display: grid;
+    grid-template-columns: auto 1fr auto auto auto;
+    gap: 1rem;
+    align-items: center;
+    padding: 1rem 1.2rem;
+    border-bottom: 1px solid var(--border);
+    background: var(--surface);
+    transition: background 0.1s;
+    animation: fadeIn 0.2s ease;
+  }
+
+  .tx-item:last-child { border-bottom: none; }
+  .tx-item:hover { background: var(--surface2); }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-4px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .tx-dot { width: 6px; height: 6px; border-radius: 50%; }
+  .tx-dot.income  { background: var(--income); }
+  .tx-dot.expense { background: var(--expense); }
+
+  .tx-desc { font-size: 0.82rem; color: var(--text); }
+  .tx-date { font-size: 0.7rem; color: var(--muted); }
+
+  .tx-amount {
+    font-family: 'Syne', sans-serif;
+    font-size: 0.95rem;
+    font-weight: 600;
+    text-align: right;
+    min-width: 90px;
+  }
+  .tx-amount.income  { color: var(--income); }
+  .tx-amount.expense { color: var(--expense); }
+
+  .btn-del {
+    background: none;
+    border: none;
+    color: var(--muted);
+    cursor: pointer;
+    font-size: 1rem;
+    padding: 0 0.2rem;
+    transition: color 0.15s;
+  }
+  .btn-del:hover { color: var(--expense); }
+
+  .empty {
+    padding: 2.5rem;
+    text-align: center;
+    color: var(--muted);
+    font-size: 0.75rem;
+    letter-spacing: 0.08em;
+    background: var(--surface);
+  }
+
+  .filters {
+    display: flex;
+    gap: 1px;
+    background: var(--border);
+    border: 1px solid var(--border);
+    margin-bottom: 1rem;
+    width: fit-content;
+  }
+
+  .filter-btn {
+    background: var(--surface);
+    border: none;
+    color: var(--muted);
+    font-family: 'DM Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 0.5rem 1rem;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+
+  .filter-btn.active { background: var(--text); color: var(--bg); }
+
+  @media (max-width: 600px) {
+    .form-row { grid-template-columns: 1fr 1fr; }
+    .form-row input[placeholder="Descripción"] { grid-column: span 2; }
+    .btn-add { grid-column: span 2; }
+    .summary { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Finanzas</h1>
+  <span id="current-date"></span>
+</header>
+
+<div class="summary">
+  <div class="card balance">
+    <label>Balance</label>
+    <div class="amount" id="balance">$0</div>
+  </div>
+  <div class="card income">
+    <label>Ingresos</label>
+    <div class="amount" id="total-income">$0</div>
+  </div>
+  <div class="card expense">
+    <label>Gastos</label>
+    <div class="amount" id="total-expense">$0</div>
+  </div>
+</div>
+
+<div class="form-section">
+  <div class="form-title">Nueva transacción</div>
+  <div class="form-row">
+    <select id="type">
+      <option value="expense">Gasto</option>
+      <option value="income">Ingreso</option>
+    </select>
+    <input type="number" id="amount" placeholder="Monto" min="0" step="0.01">
+    <input type="text" id="desc" placeholder="Descripción" maxlength="60">
+    <button class="btn-add" onclick="addTransaction()">+ Agregar</button>
+  </div>
+</div>
+
+<div class="tx-section">
+  <div class="tx-header">
+    <span class="tx-title">Movimientos</span>
+    <span class="tx-count" id="tx-count"></span>
+  </div>
+  <div class="filters">
+    <button class="filter-btn active" onclick="setFilter('all', this)">Todos</button>
+    <button class="filter-btn" onclick="setFilter('income', this)">Ingresos</button>
+    <button class="filter-btn" onclick="setFilter('expense', this)">Gastos</button>
+  </div>
+  <div class="tx-list" id="tx-list"></div>
+</div>
+
+<script>
+  let transactions = JSON.parse(localStorage.getItem('finanzas_tx') || '[]');
+  let currentFilter = 'all';
+
+  const d = new Date();
+  document.getElementById('current-date').textContent =
+    d.toLocaleDateString('es-CL', { month: 'long', year: 'numeric' });
+
+  function save() {
+    localStorage.setItem('finanzas_tx', JSON.stringify(transactions));
+  }
+
+  function fmt(n) {
+    return '$' + Number(n).toLocaleString('es-CL', { minimumFractionDigits: 0, maximumFractionDigits: 2 });
+  }
+
+  function addTransaction() {
+    const type   = document.getElementById('type').value;
+    const amount = parseFloat(document.getElementById('amount').value);
+    const desc   = document.getElementById('desc').value.trim();
+    if (!amount || amount <= 0 || !desc) return;
+
+    transactions.unshift({
+      id: Date.now(), type, amount, desc,
+      date: new Date().toLocaleDateString('es-CL', { day: '2-digit', month: '2-digit', year: '2-digit' })
+    });
+
+    document.getElementById('amount').value = '';
+    document.getElementById('desc').value = '';
+    save();
+    render();
+  }
+
+  function deleteTransaction(id) {
+    transactions = transactions.filter(t => t.id !== id);
+    save();
+    render();
+  }
+
+  function setFilter(f, btn) {
+    currentFilter = f;
+    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    render();
+  }
+
+  function render() {
+    const income  = transactions.filter(t => t.type === 'income').reduce((a, t) => a + t.amount, 0);
+    const expense = transactions.filter(t => t.type === 'expense').reduce((a, t) => a + t.amount, 0);
+
+    document.getElementById('total-income').textContent  = fmt(income);
+    document.getElementById('total-expense').textContent = fmt(expense);
+    document.getElementById('balance').textContent       = fmt(income - expense);
+
+    const filtered = currentFilter === 'all' ? transactions : transactions.filter(t => t.type === currentFilter);
+    document.getElementById('tx-count').textContent = filtered.length + ' registro' + (filtered.length !== 1 ? 's' : '');
+
+    const list = document.getElementById('tx-list');
+    if (!filtered.length) {
+      list.innerHTML = '<div class="empty">Sin movimientos</div>';
+      return;
+    }
+
+    list.innerHTML = filtered.map(t => `
+      <div class="tx-item">
+        <div class="tx-dot ${t.type}"></div>
+        <div class="tx-desc">${t.desc}</div>
+        <div class="tx-date">${t.date}</div>
+        <div class="tx-amount ${t.type}">${t.type === 'income' ? '+' : '−'}${fmt(t.amount)}</div>
+        <button class="btn-del" onclick="deleteTransaction(${t.id})" title="Eliminar">×</button>
+      </div>
+    `).join('');
+  }
+
+  document.getElementById('desc').addEventListener('keydown', e => { if (e.key === 'Enter') addTransaction(); });
+  document.getElementById('amount').addEventListener('keydown', e => { if (e.key === 'Enter') addTransaction(); });
+
+  render();
+</script>
+</body>
+</html>
